@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.amirnlz.chaoswallet"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.amirnlz.chaoswallet"
