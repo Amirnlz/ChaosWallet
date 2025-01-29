@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.amirnlz.chaoswallet.ui.theme.ChaosWalletTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,9 +21,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             ChaosWalletTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                    TouchSurface(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        viewModel<TouchViewModel>()
                     )
                 }
             }
