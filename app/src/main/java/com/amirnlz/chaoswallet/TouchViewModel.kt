@@ -8,8 +8,9 @@ import kotlinx.coroutines.flow.update
 
 
 data class TouchState(
-    val touches: List<Offset> = emptyList()
-)
+    val touches: List<Offset> = emptyList(),
+    val maxTaps: Int = 30,
+    )
 
 sealed interface TouchAction {
     data class OnTap(val offset: Offset) : TouchAction
