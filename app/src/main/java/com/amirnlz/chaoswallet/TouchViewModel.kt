@@ -12,7 +12,7 @@ import kotlinx.coroutines.withContext
 import org.bitcoinj.core.Address
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
-import org.bitcoinj.params.TestNet2Params
+import org.bitcoinj.params.MainNetParams
 
 data class TouchState(
     val touches: List<Offset> = emptyList(),
@@ -31,7 +31,7 @@ class TouchViewModel : ViewModel() {
     private val _state = MutableStateFlow(TouchState())
     val state = _state.asStateFlow()
 
-    private val networkParams: NetworkParameters = TestNet2Params.get()
+    private val networkParams: NetworkParameters = MainNetParams.get()
 
     fun onAction(action: TouchAction) {
         when (action) {
