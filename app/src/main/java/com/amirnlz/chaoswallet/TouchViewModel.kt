@@ -1,6 +1,5 @@
 package com.amirnlz.chaoswallet
 
-import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,7 +31,6 @@ class TouchViewModel : ViewModel() {
     private val _state = MutableStateFlow(TouchState())
     val state = _state.asStateFlow()
 
-    // Use Bitcoin testnet for development
     private val networkParams: NetworkParameters = TestNet2Params.get()
 
     fun onAction(action: TouchAction) {
@@ -46,7 +44,7 @@ class TouchViewModel : ViewModel() {
         _state.update { currentState ->
             val newTouches = (currentState.touches + offset).takeLast(currentState.maxTaps)
 
-            // Auto-generate wallet when max taps reached
+
             if (newTouches.size == currentState.maxTaps) {
                 generateWallet()
             }
@@ -56,16 +54,15 @@ class TouchViewModel : ViewModel() {
     }
 
     private fun generateWallet() {
-        viewModelScope.launch { // Coroutine tied to ViewModel lifecycle
+        viewModelScope.launch {
             try {
-                // Offload CPU-intensive work to IO thread
                 val (ecKey, address) = withContext(Dispatchers.IO) {
                     val key = ECKey()
                     val addr = Address.fromP2SHHash(networkParams, key.pubKeyHash).toString()
                     key to addr
                 }
 
-                // Update UI state on Main thread (StateFlow is thread-safe)
+
                 _state.update {
                     it.copy(
                         walletAddress = address,
