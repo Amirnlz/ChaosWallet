@@ -20,7 +20,7 @@ sealed class Screen(val route: String) {
 
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier, navController: NavHostController) {
-
+    val viewModel: TouchViewModel = viewModel<TouchViewModel>()
     NavHost(
         navController = navController,
         startDestination = Screen.Onboarding.route,
@@ -33,12 +33,11 @@ fun AppNavigation(modifier: Modifier = Modifier, navController: NavHostControlle
             }
         }
         composable(Screen.Tapping.route) {
-            val viewModel: TouchViewModel = viewModel<TouchViewModel>()
-            TouchSurface(viewModel = viewModel)
+            TouchSurface(viewModel = viewModel, onNextScreen = {
+                navController.navigate(Screen.WalletDisplay.route)
+            })
         }
         composable(Screen.WalletDisplay.route) {
-            val viewModel: TouchViewModel = viewModel<TouchViewModel>()
-
             WalletDisplay(viewModel = viewModel, onReset = {
                 navController.popBackStack(Screen.Onboarding.route, inclusive = false)
             })
