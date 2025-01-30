@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,8 +21,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun TouchSurface(modifier: Modifier = Modifier, viewModel: TouchViewModel) {
+fun TouchSurface(
+    modifier: Modifier = Modifier,
+    onNextScreen: () -> Unit,
+    viewModel: TouchViewModel
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isButtonEnabled: Boolean = state.touches.size == state.maxTaps
 
     Box(
         modifier = modifier
@@ -41,11 +47,21 @@ fun TouchSurface(modifier: Modifier = Modifier, viewModel: TouchViewModel) {
                 text = "Tap anywhere to generate entropy",
                 style = MaterialTheme.typography.titleMedium
             )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = onNextScreen,
+                enabled = isButtonEnabled,
+            ) {
+                Text("Display Wallet Address")
+            }
         }
+
 
         // Progress indicator
         LinearProgressIndicator(
             progress = { state.touches.size.toFloat() / state.maxTaps },
+            trackColor = MaterialTheme.colorScheme.background,
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
