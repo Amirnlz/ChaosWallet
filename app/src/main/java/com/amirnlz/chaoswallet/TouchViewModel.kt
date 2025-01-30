@@ -1,10 +1,17 @@
 package com.amirnlz.chaoswallet
 
+import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.bitcoinj.core.Address
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
@@ -44,6 +51,7 @@ class TouchViewModel : ViewModel() {
             // Auto-generate wallet when max taps reached
             if (newTouches.size == currentState.maxTaps) {
                 generateWallet()
+                Log.i("STATE", state.value.toString())
             }
 
             currentState.copy(touches = newTouches)
@@ -51,15 +59,27 @@ class TouchViewModel : ViewModel() {
     }
 
     private fun generateWallet() {
-        val ecKey = ECKey() // Generate new key pair
-        val address = Address.fromP2SHHash(networkParams, ecKey.pubKeyHash).toString()
+        viewModelScope.launch { // Coroutine tied to ViewModel lifecycle
+            try {
+                // Offload CPU-intensive work to IO thread
+                val (ecKey, address) = withContext(Dispatchers.IO) {
+                    val key = ECKey()
+                    val addr = Address.fromP2SHHash(networkParams, key.pubKeyHash).toString()
+                    key to addr
+                }
 
-        _state.update {
-            it.copy(
-                walletAddress = address,
-                privateKey = ecKey.getPrivateKeyEncoded(networkParams).toString(),
-                publicKey = ecKey.publicKeyAsHex
-            )
+                // Update UI state on Main thread (StateFlow is thread-safe)
+                _state.update {
+                    it.copy(
+                        walletAddress = address,
+                        privateKey = ecKey.getPrivateKeyEncoded(networkParams).toString(),
+                        publicKey = ecKey.publicKeyAsHex
+                    )
+                }
+            } catch (e: Exception) {
+                // Handle failures (e.g., network errors)
+                // Update state to show error message
+            }
         }
     }
 }
