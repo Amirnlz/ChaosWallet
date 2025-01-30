@@ -1,7 +1,8 @@
 package com.amirnlz.chaoswallet
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,15 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun TouchSurface(
-    modifier: Modifier = Modifier,
-    onNextScreen: () -> Unit,
-    viewModel: TouchViewModel
+    modifier: Modifier = Modifier, onNextScreen: () -> Unit, viewModel: TouchViewModel
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isButtonEnabled: Boolean = state.touches.size == state.maxTaps
@@ -32,10 +32,22 @@ fun TouchSurface(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .clickable { viewModel.onAction(TouchAction.OnTap(Offset.Zero)) }
-            .background(MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.background)
+            .pointerInput(Unit) {
+                detectTapGestures { offset ->
+                    viewModel.onAction(TouchAction.OnTap(offset))
+                }
+            },
         contentAlignment = Alignment.Center
     ) {
+        Canvas(
+            modifier = Modifier.matchParentSize()
+        ) {
+            state.touches.forEach {
+                drawCircle(color = Color.Black, radius = 8f, center = it)
+            }
+        }
+
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "${state.touches.size}/${state.maxTaps}",
@@ -57,8 +69,6 @@ fun TouchSurface(
             }
         }
 
-
-        // Progress indicator
         LinearProgressIndicator(
             progress = { state.touches.size.toFloat() / state.maxTaps },
             trackColor = MaterialTheme.colorScheme.background,
