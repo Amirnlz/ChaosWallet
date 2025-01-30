@@ -8,7 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
+import com.amirnlz.chaoswallet.navigation.AppNavigation
 import com.amirnlz.chaoswallet.ui.theme.ChaosWalletTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,12 +19,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             ChaosWalletTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    TouchSurface(
-                        Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
-                        viewModel<TouchViewModel>()
-                    )
+                    val navController = rememberNavController()
+                    AppNavigation(modifier = Modifier.padding(innerPadding), navController)
                 }
             }
         }
